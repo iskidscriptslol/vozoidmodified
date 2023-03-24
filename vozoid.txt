@@ -1209,7 +1209,7 @@ function library:CreateDropDown(holder, content, flag, callback, default, max, s
     local value = utility.create("Text", {
         Text = "NONE",
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(0, 6, 0, 0),
         Theme = "Disabled Text",
         ZIndex = 9,
@@ -1219,7 +1219,7 @@ function library:CreateDropDown(holder, content, flag, callback, default, max, s
     local icon = utility.create("Text", {
         Text = "+",
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(1, -13, 0, 0),
         Theme = "Text",
         ZIndex = 9,
@@ -1296,7 +1296,7 @@ function library:CreateDropDown(holder, content, flag, callback, default, max, s
         local title = utility.create("Text", {
             Text = name,
             Font = Drawing.Fonts.Plex,
-            Size = 16,
+            Size = 14.5,
             Position = UDim2.new(0, 8, 0, 1),
             Theme = "Disabled Text",
             ZIndex = 15,
@@ -1561,7 +1561,7 @@ function library:CreateSlider(min, max, parent, text, default, float, flag, call
     })
     local valuetext = utility.create("Text", {
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(0.5, 0, 0, -2),
         Theme = "Text",
         Center = true,
@@ -1751,7 +1751,7 @@ function library:CreateColourPicker(default, defaultalpha, parent, count, flag, 
     local text = utility.create("Text", {
         Text = string.format("%s,%s,%s", math.floor(default.R * 255), math.floor(default.G * 255), math.floor(default.B * 255)),
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(0.5, 0, 0, 0),
         Center = true,
         Theme = "Text",
@@ -1762,7 +1762,7 @@ function library:CreateColourPicker(default, defaultalpha, parent, count, flag, 
     local placeholdertext = utility.create("Text", {
         Text = "R,G,B",
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(0.5, 0, 0, 0),
         Center = true,
         Theme = "Disabled Text",
@@ -1981,7 +1981,7 @@ function library:CreateKeyBind(default, parent, blacklist, flag, callback, offse
     })
     local keytext = utility.create("Text", {
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Theme = "Disabled Text",
         Position = UDim2.new(0, 0, 0, offset),
         ZIndex = 9,
@@ -2073,7 +2073,7 @@ function library:Watermark(Message)
     local text = utility.create("Text", {
         Text = Message,
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(0.5, 0, 0, 3),
         Theme = "Text",
         Center = true,
@@ -2123,7 +2123,7 @@ function library:Load(options)
     local TextName = utility.create("Text", {
         Text = name,
         Font = Drawing.Fonts.Plex,
-        Size = 16,
+        Size = 14.5,
         Position = UDim2.new(0, 6, 0, 4),
         Theme = "Text",
         ZIndex = 4,
@@ -2204,7 +2204,7 @@ function library:Load(options)
         local title = utility.create("Text", {
             Text = name,
             Font = Drawing.Fonts.Plex,
-            Size = 16,
+            Size = 14.5,
             Position = UDim2.new(0.5, 0, 0, 3),
             Theme = #self.tabtoggles == 1 and "Text" or "Disabled Text",
             ZIndex = 7,
@@ -2299,7 +2299,7 @@ function library:Load(options)
             utility.create("Text", {
                 Text = name,
                 Font = Drawing.Fonts.Plex,
-                Size = 16,
+                Size = 14.5,
                 Position = UDim2.new(0.5, 0, 0, 3),
                 Center = true,
                 Theme = "Text",
@@ -2324,7 +2324,7 @@ function library:Load(options)
                 local text = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0, 0, 0, 0),
                     Theme = "Text",
                     ZIndex = 7,
@@ -2384,7 +2384,7 @@ function library:Load(options)
                 local text = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0.5, 0, 0, 0),
                     Theme = "Text",
                     ZIndex = 9,
@@ -2428,7 +2428,7 @@ function library:Load(options)
                 utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0.5, 0, 0, 0),
                     Center = true,
                     Theme = "Text",
@@ -2490,7 +2490,7 @@ function library:Load(options)
                 local title = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0, 17, 0, -2),
                     Theme = "Disabled Text",
                     ZIndex = 7,
@@ -2659,7 +2659,7 @@ function library:Load(options)
                 local text = utility.create("Text", {
                     Text = default,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0.5, 0, 0, 0),
                     Center = true,
                     Theme = "Text",
@@ -2670,7 +2670,7 @@ function library:Load(options)
                 local placeholdertext = utility.create("Text", {
                     Text = placeholder,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0.5, 0, 0, 0),
                     Center = true,
                     Theme = "Disabled Text",
@@ -2742,7 +2742,7 @@ function library:Load(options)
                 local title = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0, 0, 0, -2),
                     Theme = "Text",
                     ZIndex = 7,
@@ -2793,7 +2793,7 @@ function library:Load(options)
                 local title = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0, 0, 0, -2),
                     Theme = "Text",
                     ZIndex = 7,
@@ -2844,7 +2844,7 @@ function library:Load(options)
                 local title = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0, 0, 0, -2),
                     Theme = "Text",
                     ZIndex = 7,
@@ -2871,7 +2871,7 @@ function library:Load(options)
                 local title = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Position = UDim2.new(0, 0, 0, 0),
                     Theme = "Text",
                     ZIndex = 7,
@@ -2909,7 +2909,7 @@ function library:Load(options)
                 local title = utility.create("Text", {
                     Text = name,
                     Font = Drawing.Fonts.Plex,
-                    Size = 16,
+                    Size = 14.5,
                     Theme = "Text",
                     ZIndex = 7,
                     Outline = true,
