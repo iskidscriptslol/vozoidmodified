@@ -1,0 +1,500 @@
+-- // Tables
+local Library = {
+    Theme = {
+        Accent = Color3.fromHex("4682B4"),
+        Background = Color3.fromHex("141414"),
+        Select = Color3.fromHex("FF0000"),
+        Important = Color3.fromHex("3880B0"),
+        Group = Color3.fromHex("FFFF00"),
+        Text = Color3.fromHex("F8FCF8")
+    },
+    Shared = {
+	ExtremelyLowIncrement = {"0.01", "0.02", "0.03", "0.04", "0.05", "0.06", "0.07", "0.08", "0.09", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"}
+        LowIncriment = {"0.5", "2", "4", "6", "8", "10", "15", "20", "25", "30", "40", "50", "60", "70", "80", "90", "100"},
+        MidIncriment = {"1", "1.25", "1.5", "1.75", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7.5", "8", "8.5", "9", "9.5", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "30", "34", "38", "42", "46", "50", "55", "60", "65", "70", "80", "90", "100"},
+        HighIncriment = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "12", "14", "16", "18", "20", "25", "30", "35", "40", "45", "50", "60", "70", "80", "90", "100"},
+        HighIncriment2 = {},
+        HighIncriment3 = {},
+        HundreadIncriment = {}
+    },
+    Flags = {},
+    Objects = {},
+    Connections = {}
+}
+local Utility = {}
+-- // Variables
+local ReplicatedStorage, UserInputService, TeleportService, HttpService, RunService, Workspace, Lighting, CoreGui, Players, Teams, Stats = game:GetService("ReplicatedStorage"), game:GetService("UserInputService"), game:GetService("TeleportService"), game:GetService("HttpService"), game:GetService("RunService"), game:GetService("Workspace"), game:GetService("Lighting"), game:GetService("CoreGui"), game:GetService("Players"), game:GetService("Teams"), game:GetService("Stats")
+--
+local GetUpvalue = debug.getupvalue
+--
+local CreateRenderObject = GetUpvalue(Drawing.new, 1)
+local DestroyRenderObject = GetUpvalue(GetUpvalue(Drawing.new, 7).__index, 3)
+local SetRenderProperty = GetUpvalue(GetUpvalue(Drawing.new, 7).__newindex, 4)
+local GetRenderProperty = GetUpvalue(GetUpvalue(Drawing.new, 7).__index, 4)
+--
+local Flags = Library.Flags
+-- // Preset
+do
+    for Index = 0, 500 do
+        if (Index % 2) == 0 then
+            Library.Shared.HighIncriment2[#Library.Shared.HighIncriment2 + 1] = tostring(Index)
+            Library.Shared.HighIncriment3[#Library.Shared.HighIncriment3 + 1] = tostring((Index / 2) * 10)
+        end
+    end
+    --
+    for Index = -100, 100 do
+        Library.Shared.HundreadIncriment[#Library.Shared.HundreadIncriment + 1] = tostring(Index)
+    end
+end
+-- // Functions
+do -- Utility
+    function Utility:GetColor(Value)
+        if typeof(Value) == "string" then
+            Value = Library.Theme[Value]
+        end
+        --
+        return Value
+    end
+    --
+    function Utility:Create(Object, ObjectProperties)
+        local Render = CreateRenderObject(Object)
+        --
+        for Index, Value in pairs(ObjectProperties) do
+            SetRenderProperty(Render, Index, Index == "Color" and Utility:GetColor(Value) or Value)
+        end
+        --
+        Library.Objects[#Library.Objects + 1] = Render
+        --
+        return Render
+    end
+    --
+    function Utility:Connection(Object, ...)
+        local Connection = Object:Connect(...)
+        --
+        Library.Connections[#Library.Connections + 1] = Connection
+        --
+        return Connection
+    end
+    --
+    function Utility:Surround(Object, Color, Thickness, Ignore)
+        local Thickness = (Thickness or 1)
+        local Color = (Color or "Accent")
+        local Surround = {
+            Objects = {}
+        }
+        --
+        function Surround:Update()
+            local Size = GetRenderProperty(Object, "Size")
+            local Position = GetRenderProperty(Object, "Position")
+            --
+            for Index, Value in pairs(Surround.Objects) do
+                local Width = ((Index == 1 or Index == 2) and Thickness or (Size.X + (Thickness * 2)))
+                local Height = ((Index == 3 or Index == 4) and Thickness or (Size.Y + (Thickness * 2)))
+                local WidthPos = (Index == 1 and -Thickness or Index == 2 and Size.X or (0 - Thickness))
+                local HeightPos = (Index == 3 and -Thickness or Index == 4 and Size.Y or (0 - Thickness))
+                --
+                SetRenderProperty(Value, "Size", Vector2.new(Width, Height))
+                SetRenderProperty(Value, "Position", Vector2.new(Position.X + WidthPos, Position.Y + HeightPos))
+            end
+        end
+        --
+        for Index = 1, 4 do
+            Surround.Objects[#Surround.Objects + 1] = Utility:Create("Square", {
+                Visible = true,
+                ZIndex = 1000,
+                Transparency = 1,
+                Color = Color,
+                Filled = true
+            })
+        end
+        --
+        if not Ignore then Surround:Update() end
+        --
+        return Surround
+    end
+end
+-- // Library
+do
+    Library.__index = Library
+    --
+    function Library:New(ObjectProperties)
+        local ObjectProperties = (ObjectProperties or {})
+        local Window = {
+            Name = (ObjectProperties.name or ObjectProperties.Name or ObjectProperties.title or ObjectProperties.Title or "Window"),
+            Theme = (ObjectProperties.theme or ObjectProperties.Theme or ObjectProperties.color or ObjectProperties.Color),
+            Size = ((ObjectProperties.size or ObjectProperties.Size or ObjectProperties.width or ObjectProperties.Width or 180) - 2),
+            Options = (ObjectProperties.options or ObjectProperties.Options or {}),
+            Attached = {},
+            Items = {},
+            Select = 1,
+            Held = nil
+        }
+        --
+        if Window.Theme then
+            Library.Theme = Window.Theme
+        end
+        --
+        do -- Functions
+            function Window:Unload()
+                for Index, Value in pairs(Window.Attached) do
+                    Value()
+                end
+                --
+                for Index, Value in pairs(Library.Connections) do
+                    Value:Disconnect()
+                end
+                --
+                for Index, Value in pairs(Library.Objects) do
+                    DestroyRenderObject(Value)
+                end
+                --
+                Library.Objects = nil
+                Library.Connections = nil
+                Library = nil
+            end
+            --
+            function Window:Attach(Func)
+                Window.Attached[#Window.Attached + 1] = Func
+            end
+            --
+            function Window:AddItem(Name, Color, Enabled, Current, Options, Callback)
+                local Item = {Name = Value, Color = Color, Enabled = Enabled, Current = Current, Object = Utility:Create("Text", {
+                    Visible = true,
+                    ZIndex = 1000,
+                    Transparency = 1,
+                    Color = Color,
+                    Text = Name,
+                    Size = 13,
+                    Center = false,
+                    Outline = true,
+                    Font = 2
+                }), Option = Utility:Create("Text", {
+                    Visible = true,
+                    ZIndex = 1000,
+                    Transparency = 1,
+                    Color = Color,
+                    Text = Options[Current],
+                    Size = 13,
+                    Center = false,
+                    Outline = true,
+                    Font = 2
+                }), Options = Options, Callback = Callback}
+                --
+                function Item:Move(Number)
+                    Item.Current = Item.Current + Number
+                    --
+                    if Item.Current > #Item.Options then
+                        Item.Current = 1
+                    elseif Item.Current <= 0 then
+                        Item.Current = #Item.Options
+                    end
+                end
+                --
+                function Item:Update()
+                    SetRenderProperty(Item.Option, "Text", Item.Options[Item.Current])
+                    --
+                    Item.Callback(Item.Options[Item.Current], Item.Current)
+                end
+                --
+                Window.Items[#Window.Items + 1] = Item
+                --
+                return Item
+            end
+            --
+            function Window:Ammount()
+                local Ammount = 0
+                --
+                for Index, Value in pairs(Window.Items) do
+                    if Value.Enabled then
+                        Ammount = Ammount + 1
+                    end
+                end
+                --
+                return Ammount
+            end
+            --
+            function Window:Recolor()
+                local Index1 = 1
+                --
+                for Index, Value in pairs(Window.Items) do
+                    if Value.Enabled then
+                        local Color = (Index1 == Window.Select and Utility:GetColor("Select") or Utility:GetColor(Value.Color))
+                        --
+                        SetRenderProperty(Value.Object, "Color", Color)
+                        SetRenderProperty(Value.Option, "Color", Color)
+                        --
+                        Index1 = Index1 + 1
+                    end
+                end
+            end
+            --
+            function Window:GetItem()
+                local Index1 = 1
+                --
+                for Index, Value in pairs(Window.Items) do
+                    if Value.Enabled then
+                        if Index1 == Window.Select then
+                            return Value
+                        end
+                        --
+                        Index1 = Index1 + 1
+                    end
+                end
+            end
+            --
+            function Window:Move(Number)
+                local Ammount = Window:Ammount()
+                Window.Select = Window.Select + Number
+                --
+                if Window.Select > Ammount then
+                    Window.Select = 1
+                elseif Window.Select <= 0 then
+                    Window.Select = Ammount
+                end
+                --
+                Window:Recolor()
+                Window:Update()
+            end
+        end
+        --
+        do -- Renders
+            local MainFrame = Utility:Create("Square", {
+                Visible = true,
+                ZIndex = 1000,
+                Transparency = 1 - (150/255),
+                Color = "Background",
+                Filled = true
+            })
+            --
+            local Surround = Utility:Surround(MainFrame, "Accent", 1, true)
+            --
+            local Title = Utility:Create("Text", {
+                Visible = true,
+                ZIndex = 1000,
+                Transparency = 1,
+                Color = "Group",
+                Text = Window.Name,
+                Size = 13,
+                Center = true,
+                Outline = true,
+                Font = 2
+            })
+            --
+            local Line = Utility:Create("Square", {
+                Visible = true,
+                ZIndex = 1000,
+                Transparency = 1,
+                Color = "Accent",
+                Size = Vector2.new(Window.Size, 1),
+                Filled = true
+            })
+            --
+            local Groups = {}
+            --
+            for Index, Value in pairs(Window.Options) do
+                local GroupOptions = {}
+                local Group
+                --
+                Group = Window:AddItem(("[%s]"):format(Value.Name), "Group", true, 1, {"+", "-"}, function(Option)
+                    local Enabled = (Option == "-")
+                    --
+                    if Enabled then
+                        for Index3, Value3 in pairs(Groups) do
+                            if Value3 ~= Group and Value3.Current == 2 then
+                                Value3.Current = 1
+                                --
+                                Value3:Update()
+                                Window:Update()
+                            end
+                        end
+                        --
+                        Window.Select = Index
+                    end
+                    --
+                    for Index2, Value2 in pairs(GroupOptions) do
+                        Value2.Enabled = Enabled
+                    end
+                    --
+                    Window:Update()
+                end)
+                --
+                Groups[#Groups + 1] = Group
+                --
+                for Index2, Value2 in pairs(Value.Options) do
+                    local Flag
+                    local Callback = (Value2.Callback or Value2.callback)
+                    --
+                    if Value2.Flag then
+                        Flag = {
+                            Value = (Value2.State or 1),
+                            Current = (Value2.Options[Value2.State or 1]),
+                            Option = nil
+                        }
+                        --
+                        function Flag:Get(Number)
+                            return Number and Flag.Value or Flag.Current
+                        end
+                        --
+                        function Flag:Set(Value)
+                            if Flag.Option then
+                                Flag.Option.Current = Value
+                                Flag.Option:Update()
+                            end
+                        end
+                    end
+                    --
+                    local Option = Window:AddItem((" %s"):format(Value2.Name), Value2.Important and "Important" or "Text", false, (Value2.State or 1), Value2.Options, function(Option, Value)
+                        if Flag then
+                            Flag.Value = Value
+                            Flag.Current = Option
+                        end
+                        --
+                        if Callback then
+                            Callback(Flag:Get())
+                        end
+                    end)
+                    --
+                    if Flag then
+                        Flag.Option = Option
+                        Library.Flags[Value2.Flag] = Flag
+                    end
+                    --
+                    GroupOptions[#GroupOptions + 1] = Option
+                end
+            end
+            --
+            function Window:Update()
+                local ViewportSize = Workspace.CurrentCamera.ViewportSize
+                local MainFrameSize = Vector2.new(Window.Size, 37 + (Window:Ammount() * 16))
+                local MainFramePosition = Vector2.new(25, (ViewportSize.Y / 2) - (MainFrameSize.Y / 2))
+                --
+                SetRenderProperty(MainFrame, "Size", MainFrameSize)
+                SetRenderProperty(MainFrame, "Position", MainFramePosition)
+                --
+                Surround:Update()
+                --
+                SetRenderProperty(Title, "Position", (MainFramePosition + Vector2.new(Window.Size / 2, 5)))
+                SetRenderProperty(Line, "Position", (MainFramePosition + Vector2.new(0, 23)))
+                --
+                local Index2 = 1
+                --
+                for Index1, Value in pairs(Window.Items) do
+                    if Value.Enabled then
+                        local Shift = ((Index2 - 1) * 16)
+                        --
+                        SetRenderProperty(Value.Object, "Position", (MainFramePosition + Vector2.new(7, 31 + Shift)))
+                        SetRenderProperty(Value.Option, "Position", (MainFramePosition + Vector2.new(Window.Size - 7 - (#Value.Options[Value.Current] * 7), 31 + Shift)))
+                        --
+                        SetRenderProperty(Value.Object, "Visible", true)
+                        SetRenderProperty(Value.Option, "Visible", true)
+                        --
+                        Index2 = Index2 + 1
+                    else
+                        SetRenderProperty(Value.Object, "Visible", false)
+                        SetRenderProperty(Value.Option, "Visible", false)
+                    end
+                end
+            end
+        end
+        --
+        do -- Connections
+            Utility:Connection(UserInputService.InputBegan, function(Input)
+                if Input.KeyCode == Enum.KeyCode.Return then
+                    local Item = Window:GetItem()
+                    --
+                    Item:Move(1)
+                    Item:Update()
+                    Window:Update()
+                    --
+                    Window.Held = {Enum.KeyCode.Return, 0, tick()}
+                elseif Input.KeyCode == Enum.KeyCode.F then
+                    local Item = Window:GetItem()
+                    --
+                    Item:Move(-1)
+                    Item:Update()
+                    Window:Update()
+                    --
+                    Window.Held = {Enum.KeyCode.F, 0, tick()}
+                elseif Input.KeyCode == Enum.KeyCode.H then
+                    local Item = Window:GetItem()
+                    --
+                    Item:Move(1)
+                    Item:Update()
+                    Window:Update()
+                    --
+                    Window.Held = {Enum.KeyCode.H, 0, tick()}
+                elseif Input.KeyCode == Enum.KeyCode.T then
+                    Window:Move(-1)
+                    --
+                    Window.Held = {Enum.KeyCode.T, 0, tick()}
+                elseif Input.KeyCode == Enum.KeyCode.G then
+                    Window:Move(1)
+                    --
+                    Window.Held = {Enum.KeyCode.G, 0, tick()}
+                end
+                --
+                if Input.KeyCode == Enum.KeyCode.X and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                    Window:Unload()
+                end
+            end)
+            --
+            Utility:Connection(UserInputService.InputEnded, function(Input)
+                if Window.Held and Window.Held[1] and Input.KeyCode == Window.Held[1] then
+                    Window.Held = nil
+                end
+            end)
+            --
+            local TotalDelta = 0
+            --
+            Utility:Connection(RunService.RenderStepped, function(Delta)
+                TotalDelta = TotalDelta + Delta
+                --
+                if (TotalDelta < 1 / 30) then
+                    return
+                end
+                --
+                TotalDelta = 0
+                --
+                if Window.Held and Window.Held[1] and Window.Held[2] and Window.Held[3] then
+                    local Time = (tick() - Window.Held[3])
+                    --
+                    if Time > 0.4 then
+                        Window.Held[2] = Window.Held[2] + 1
+                        --
+                        if (Window.Held[2] % 2 == 0) then
+                            if Window.Held[1] == Enum.KeyCode.Return then
+                                local Item = Window:GetItem()
+                                --
+                                Item:Move(1)
+                                Item:Update()
+                                Window:Update()
+                            elseif Window.Held[1] == Enum.KeyCode.F then
+                                local Item = Window:GetItem()
+                                --
+                                Item:Move(-1)
+                                Item:Update()
+                                Window:Update()
+                            elseif Window.Held[1] == Enum.KeyCode.H then
+                                local Item = Window:GetItem()
+                                --
+                                Item:Move(1)
+                                Item:Update()
+                                Window:Update()
+                            elseif Window.Held[1] == Enum.KeyCode.T then
+                                Window:Move(-1)
+                            elseif Window.Held[1] == Enum.KeyCode.G then
+                                Window:Move(1)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        --
+        Window:Recolor()
+        --
+        return Window
+    end
+end
+--
+return Library, Utility, Flags
